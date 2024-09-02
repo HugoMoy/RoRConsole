@@ -24,8 +24,12 @@ public class CharacterManager : MonoBehaviour
             healthSlider.maxValue = MaxHealth;
             healthSlider.value = Health;
 
+            // Update text component of the Health bar
+            healthSlider.GetComponentInChildren<Text>().text = Health + "/" + MaxHealth;
+
             // Get the Image component of the Fill area
             fillImage = healthSlider.fillRect.GetComponent<Image>();
+            
 
             if (fillImage != null)
             {
@@ -52,7 +56,10 @@ public class CharacterManager : MonoBehaviour
        if (healthSlider != null)
         {
             // Update the Slider value with the current Health
-            healthSlider.value = Mathf.Lerp(healthSlider.value, Health, Time.deltaTime * lerpSpeed);
+            float tempHealth = Mathf.Lerp(healthSlider.value, Health, Time.deltaTime * lerpSpeed);
+            healthSlider.value = tempHealth;
+            healthSlider.GetComponentInChildren<Text>().text = (int)tempHealth + "/" + MaxHealth;
+
 
             // Update the color of the Fill area based on the health value
             UpdateFillColor();

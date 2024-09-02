@@ -8,9 +8,9 @@ public enum Characters
         SECRET
     }
 public class HandleInputs : MonoBehaviour
-{
-    
+{    
     public GameManager gameManager;
+    public MessagePanelManager messagePanelManager;
     Characters charcterSelected;
 
     // Start is called before the first frame update
@@ -22,7 +22,15 @@ public class HandleInputs : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        // Check for mouse click
+        if (messagePanelManager.CanDisplay && Input.GetMouseButtonDown(0))
+        {
+            // Hide or deactivate the MessagePanelManager panel
+            if (messagePanelManager != null)
+            {
+                messagePanelManager.HideMessage();
+            }
+        }
     }
 
     public void AttackClicked(int attackNumber)
@@ -46,6 +54,19 @@ public class HandleInputs : MonoBehaviour
                 Debug.Log("Invalid character selected");
                 break;
         }      
+
+        StartCoroutine(HidePanelAfterDelay(2f));
+    }
+
+    private IEnumerator HidePanelAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // Hide or deactivate the MessagePanelManager panel
+        if (messagePanelManager != null)
+        {
+            messagePanelManager.HideMessage();
+        }
     }
 
     void CommandoAttack(int attackNumber)
@@ -55,6 +76,8 @@ public class HandleInputs : MonoBehaviour
             case 1:
                 Debug.Log("Commando Attack 1");
                 gameManager.inflictDamage(true, "Lemurian", 10);
+                messagePanelManager.SetMessage("Commando fire a shot at Lemurian, it deals " + 10 + " damage !");
+                messagePanelManager.DisplayMessage();
                 break;
             case 2:
                 Debug.Log("Commando Attack 2");
