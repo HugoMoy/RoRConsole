@@ -5,12 +5,14 @@ using UnityEngine.UI;
 
 public class MessagePanelManager : MonoBehaviour
 {
-    public int fontSize = 14;
-    public Color color = Color.red;
+    private int fontSize = 35;
+    private Color color = Color.red;
     public float promptSpeed = 0.05f;
 
     private Text DisplayTextComponent;
-    public bool CanDisplay;
+    public bool CanDisplay;    
+    private Image panelImage; // Reference to the Image component
+
     public string TextToDisplay = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
 
     private int index = 0;
@@ -19,6 +21,14 @@ public class MessagePanelManager : MonoBehaviour
     void Start()
     {
         DisplayTextComponent = GetComponentInChildren<Text>();
+        panelImage = GetComponent<Image>(); // Get the Image component
+        if (panelImage != null)
+        {
+            Color panelColor = panelImage.color;
+            panelColor.a = 1f; // Set alpha to 1 (fully opaque)
+            panelImage.color = panelColor;
+        }
+        DisplayTextComponent.fontSize = fontSize;
         gameObject.SetActive(false);
     }
 
@@ -64,5 +74,8 @@ public class MessagePanelManager : MonoBehaviour
     {
         gameObject.SetActive(false);
         CanDisplay = false;
+        DisplayTextComponent.text = "";
+        index = 0;
+        previousIndex = 0;
     }
 }

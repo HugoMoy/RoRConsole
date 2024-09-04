@@ -3,8 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public class CharacterData
+{
+    public string ImgName;
+    public int MaxHealth;
+    public string Name;
+}
+
 public class CharacterManager : MonoBehaviour
 {
+    public Image CharacterImage;
+
     public int Health;
     public int MaxHealth;
     private Slider healthSlider;
@@ -21,11 +30,10 @@ public class CharacterManager : MonoBehaviour
         if (healthSlider != null)
         {
             // Set the maxValue and initial value of the Slider
-            healthSlider.maxValue = MaxHealth;
-            healthSlider.value = Health;
+           
 
             // Update text component of the Health bar
-            healthSlider.GetComponentInChildren<Text>().text = Health + "/" + MaxHealth;
+            healthSlider.GetComponentInChildren<Text>().text = "-/-";
 
             // Get the Image component of the Fill area
             fillImage = healthSlider.fillRect.GetComponent<Image>();
@@ -66,6 +74,42 @@ public class CharacterManager : MonoBehaviour
         } 
     }
 
+    public void LoadCharacterData(CharacterData characterData)
+    {
+        MaxHealth = characterData.MaxHealth;
+        // always start full life
+        Health = characterData.MaxHealth;
+        healthSlider = GetComponentInChildren<Slider>();
+
+        Sprite sprite = Resources.Load<Sprite>("images/" + characterData.ImgName);
+        if(sprite == null)
+        {
+            Debug.LogError("Sprite not found in Resources folder: " + characterData.ImgName);
+            return;
+        }
+        CharacterImage.sprite = sprite;
+
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = MaxHealth;
+            healthSlider.value = Health;
+            healthSlider.GetComponentInChildren<Text>().text = "-/-";
+            
+            fillImage = healthSlider.fillRect.GetComponent<Image>();     
+            if (fillImage != null)
+            {
+                UpdateFillColor();
+            }
+            else
+            {
+                Debug.LogError("No Image component found in the Fill area.");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Set the color of the Fill area based on the health value
+    /// </summary>
     private void UpdateFillColor()
     {
         if (fillImage != null)
