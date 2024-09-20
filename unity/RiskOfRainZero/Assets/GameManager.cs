@@ -12,12 +12,14 @@ public class GameManager : MonoBehaviour
     public GameObject Hero;
     public GameObject Enemy;
     public MessagePanelManager messagePanelManager;
+    public EventManager eventManager;
 
     // XP - START
     public Slider xpSlider;
     private int currentXP = 60;
     private int xpForNextLevel = 100;
     private Image xpfillImage; 
+    private bool startFight;
     // XP - END
 
     void Start()
@@ -49,30 +51,6 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        // Select a foe 
-        int dice = Random.Range(1, 101);
-        CharacterData enemyData = new CharacterData();
-        if(dice < 50)
-        {
-            enemyData.ImgName = "lemurian";
-            enemyData.MaxHealth = 80;
-            enemyData.Name = "Lemurian";
-        }
-        else if (dice < 80)
-        {
-            enemyData.ImgName = "millenialTurtle";
-            enemyData.MaxHealth = 130;
-            enemyData.Name = "Millenial Turtle";
-        }
-        else
-        {
-            enemyData.ImgName = "wisp";
-            enemyData.MaxHealth = 50;
-            enemyData.Name = "Flame wisp";
-        }
-
-        Enemy.GetComponent<CharacterManager>().LoadCharacterData(enemyData);
-
         if (xpSlider != null)
         {
             // Get the Image component of the Fill area
@@ -88,12 +66,31 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("No Image component found in the Fill area.");
             }
         }
+
+        startFight = true;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        CheckDeath();
+        EventManager.EventType currentEvent = eventManager.CurrentEvent();
+        if(currentEvent == EventManager.EventType.ENEMY)
+        {
+            // check transition 
+            if(startFight)
+            {
+                CharacterData enemyData = eventManager.GetRandomEnemy();
+                // load new enemy
+                Enemy.GetComponent<CharacterManager>().LoadCharacterData(enemyData);
+                
+                messagePanelManager.SetMessage("An angry " + enemyData.Name + " appeared!");
+                messagePanelManager.DisplayMessage();
+
+                startFight = false;
+            }
+
+            CheckDeath();
+        }
     }
 
     public void inflictDamage(bool isHero, string enemyName, int damage)
@@ -143,16 +140,10 @@ public class GameManager : MonoBehaviour
             messagePanelManager.SetMessage("Enemy is dead");
             messagePanelManager.DisplayMessage();
 
-            // for now reload an enemy
-            Enemy.GetComponent<CharacterManager>().LoadCharacterData(new CharacterData
-            {
-                ImgName = "lemurian",
-                MaxHealth = 80,
-                Name = "Lemurian"
-            });
-
             currentXP+=30;
             UpdateXpSlider();
+
+            startFight = true;
         }
     }
 

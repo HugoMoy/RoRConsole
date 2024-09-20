@@ -12,6 +12,7 @@ public class HandleInputs : MonoBehaviour
     public GameManager gameManager;
     public MessagePanelManager messagePanelManager;
     Characters charcterSelected;
+    private Coroutine hidePanelCoroutine;
 
     // Start is called before the first frame update
     void Start()
@@ -29,6 +30,7 @@ public class HandleInputs : MonoBehaviour
             if (messagePanelManager != null)
             {
                 messagePanelManager.HideMessage();
+                StopCoroutine(hidePanelCoroutine);
             }
         }
     }
@@ -55,7 +57,7 @@ public class HandleInputs : MonoBehaviour
                 break;
         }      
 
-        StartCoroutine(HidePanelAfterDelay(2f));
+        hidePanelCoroutine = StartCoroutine(HidePanelAfterDelay(2f));
     }
 
     private IEnumerator HidePanelAfterDelay(float delay)
@@ -67,6 +69,8 @@ public class HandleInputs : MonoBehaviour
         {
             messagePanelManager.HideMessage();
         }
+
+        hidePanelCoroutine = null;
     }
 
     void CommandoAttack(int attackNumber)

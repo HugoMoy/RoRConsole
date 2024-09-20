@@ -15,6 +15,7 @@ public class CharacterManager : MonoBehaviour
     public Image CharacterImage;
 
     public Text TextEffectTemplate;
+    // public string CharacterName;
     public int Health;
     public int MaxHealth;
     public Slider healthSlider;
