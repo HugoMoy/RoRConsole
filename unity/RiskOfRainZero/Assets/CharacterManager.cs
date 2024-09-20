@@ -14,35 +14,33 @@ public class CharacterManager : MonoBehaviour
 {
     public Image CharacterImage;
 
+    public Text TextEffectTemplate;
     public int Health;
     public int MaxHealth;
-    private Slider healthSlider;
-    private Image fillImage; 
+    public Slider healthSlider;
+    private Image healthfillImage; 
     private float lerpSpeed = 5f;
     private int previousHealth;
 
     // Start is called before the first frame update
     void Start()
     {
-        // Get the Slider component from the child GameObject
-        healthSlider = GetComponentInChildren<Slider>();
 
+        
         if (healthSlider != null)
         {
-            // Set the maxValue and initial value of the Slider
-           
 
             // Update text component of the Health bar
             healthSlider.GetComponentInChildren<Text>().text = "-/-";
 
             // Get the Image component of the Fill area
-            fillImage = healthSlider.fillRect.GetComponent<Image>();
+            healthfillImage = healthSlider.fillRect.GetComponent<Image>();
             
 
-            if (fillImage != null)
+            if (healthfillImage != null)
             {
                 // Set the color of the Fill area based on the health value
-                UpdateFillColor();
+                UpdateHealthSlider();
             }
             else
             {
@@ -56,12 +54,14 @@ public class CharacterManager : MonoBehaviour
         
         // Initialize previousHealth
         previousHealth = Health;
+
+       
     }
 
     // Update is called once per frame
     void Update()
     {
-       if (healthSlider != null)
+        if (healthSlider != null)
         {
             // Update the Slider value with the current Health
             float tempHealth = Mathf.Lerp(healthSlider.value, Health, Time.deltaTime * lerpSpeed);
@@ -70,7 +70,7 @@ public class CharacterManager : MonoBehaviour
 
 
             // Update the color of the Fill area based on the health value
-            UpdateFillColor();
+            UpdateHealthSlider();
         } 
     }
 
@@ -95,10 +95,10 @@ public class CharacterManager : MonoBehaviour
             healthSlider.value = Health;
             healthSlider.GetComponentInChildren<Text>().text = "-/-";
             
-            fillImage = healthSlider.fillRect.GetComponent<Image>();     
-            if (fillImage != null)
+            healthfillImage = healthSlider.fillRect.GetComponent<Image>();     
+            if (healthfillImage != null)
             {
-                UpdateFillColor();
+                UpdateHealthSlider();
             }
             else
             {
@@ -110,17 +110,19 @@ public class CharacterManager : MonoBehaviour
     /// <summary>
     /// Set the color of the Fill area based on the health value
     /// </summary>
-    private void UpdateFillColor()
+    private void UpdateHealthSlider()
     {
-        if (fillImage != null)
+        if (healthfillImage != null)
         {
             // Calculate the health percentage
             float healthPercentage = (float)Health / MaxHealth;
 
             // Set the color to green when health is full and red when health is zero
-            fillImage.color = Color.Lerp(Color.red, Color.green, healthPercentage);
+            healthfillImage.color = Color.Lerp(Color.red, Color.green, healthPercentage);
         }
     }
+
+
 
     public void TakeDamage(int damage)
     {
@@ -130,11 +132,53 @@ public class CharacterManager : MonoBehaviour
         {
             Health = 0;
         }
+        // Show a text effect that disappears after a few seconds
+        ShowTextEffect("-" + damage, Color.red);
 
         // Update the Slider value and color
         if (healthSlider != null)
         {
-            UpdateFillColor();
+            UpdateHealthSlider();
         }
+    }
+
+    public void ShowTextEffect(string text, Color color)
+    {        
+        Canvas canvas = this.GetComponentInChildren<Canvas>();
+        GameObject textEffectInstance = Instantiate(TextEffectTemplate.gameObject, canvas.transform);
+        textEffectInstance.SetActive(false);
+
+        Text textComponent = textEffectInstance.GetComponent<Text>();
+        if (textComponent != null)
+        {
+            textComponent.text = text;
+            textComponent.fontSize = 25;
+            textComponent.color = color;
+            textComponent.alignment = TextAnchor.MiddleCenter; // Center the text
+            if (textComponent.font == null)
+            {
+                textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            }
+        }
+        else
+        {
+            Debug.LogError("Text component not found on the instantiated TextEffectTemplate.");
+            return;
+        }
+        
+        textEffectInstance.transform.position = CharacterImage.transform.position;
+        textEffectInstance.transform.SetAsLastSibling();
+
+        TextMoveAndFadeHandler textMoveAndFadeHandler = textEffectInstance.GetComponent<TextMoveAndFadeHandler>();
+        if (textMoveAndFadeHandler != null)
+        {
+            textMoveAndFadeHandler.Initialize(Vector3.up, 35, 2, 3); // Example parameters
+        }
+        else
+        {
+            Debug.LogError("No TextMoveAndFadeHandler component found on the instantiated TextEffectTemplate.");
+        }
+
+        textEffectInstance.SetActive(true);
     }
 }

@@ -11,6 +11,14 @@ public class GameManager : MonoBehaviour
     public Button attackButton4;
     public GameObject Hero;
     public GameObject Enemy;
+    public MessagePanelManager messagePanelManager;
+
+    // XP - START
+    public Slider xpSlider;
+    private int currentXP = 60;
+    private int xpForNextLevel = 100;
+    private Image xpfillImage; 
+    // XP - END
 
     void Start()
     {
@@ -64,12 +72,28 @@ public class GameManager : MonoBehaviour
         }
 
         Enemy.GetComponent<CharacterManager>().LoadCharacterData(enemyData);
+
+        if (xpSlider != null)
+        {
+            // Get the Image component of the Fill area
+            xpfillImage = xpSlider.fillRect.GetComponent<Image>();
+            xpSlider.maxValue = xpForNextLevel;
+            if (xpfillImage != null)
+            {
+                // Set the color of the Fill area based on the health value
+                UpdateXpSlider();
+            }
+            else
+            {
+                Debug.LogError("No Image component found in the Fill area.");
+            }
+        }
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        CheckDeath();
     }
 
     public void inflictDamage(bool isHero, string enemyName, int damage)
@@ -86,23 +110,50 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+
+    private void UpdateXpSlider()
+    {
+        if (xpfillImage != null)
+        {
+            // Calculate the health percentage
+            float xpPercentage = (float)currentXP / xpForNextLevel;
+
+            // Debug.LogError(xpPercentage+" "+currentXP+" "+xpForNextLevel);
+            // Set the color to green when health is full and red when health is zero
+            xpfillImage.color = Color.Lerp(Color.blue, Color.green, xpPercentage);
+            xpSlider.value = currentXP;
+        }
+        else
+        {
+            Debug.LogError("No Image component found in the Fill area.");
+        }
+    }
+
     void CheckDeath()
     {
-        // if(Hero.GetComponent<CharacterManager>().Health <= 0)
-        // {
-        //     Debug.Log("Hero is dead");
+        if(Hero.GetComponent<CharacterManager>().Health <= 0)
+        {
+            Debug.Log("Hero is dead");
+        }
+        else if(Enemy.GetComponent<CharacterManager>().Health <= 0)
+        {
+            Debug.Log("Enemy is dead");
 
+            messagePanelManager.SetMessage("Enemy is dead");
+            messagePanelManager.DisplayMessage();
 
-        // }
-        // else if(Enemy.GetComponent<CharacterManager>().Health <= 0)
-        // {
-        //     Debug.Log("Enemy is dead");
-        //     messagePanelManager.SetMessage("");
+            // for now reload an enemy
+            Enemy.GetComponent<CharacterManager>().LoadCharacterData(new CharacterData
+            {
+                ImgName = "lemurian",
+                MaxHealth = 80,
+                Name = "Lemurian"
+            });
 
-        //     // for now reload an enemy
-
-        //     Enemy.GetComponent<CharacterManager>()
-        // }
+            currentXP+=30;
+            UpdateXpSlider();
+        }
     }
 
 
