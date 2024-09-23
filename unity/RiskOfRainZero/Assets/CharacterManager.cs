@@ -9,6 +9,14 @@ public class CharacterData
     public string ImgName;
     public int MaxHealth;
     public string Name;
+    public int Strength;
+    public int CritChance;
+}
+
+public struct DamageLine{
+    public int Damage;
+    public bool IsCritical;
+    public List<string> AdditionalEffects;
 }
 
 public class Item
@@ -24,8 +32,13 @@ public class CharacterManager : MonoBehaviour
     public Text TextEffectTemplate;
     public GameObject ItemTemplate;
     // public string CharacterName;
+
+    // Stats 
     public int Health;
     public int MaxHealth;
+    public int Strength;
+    public int CritChance;
+    // UI
     public Slider healthSlider;
     private Image healthfillImage; 
     private float lerpSpeed = 5f;
@@ -141,6 +154,7 @@ public class CharacterManager : MonoBehaviour
 
     public void LoadCharacterData(CharacterData characterData)
     {
+        Strength = characterData.Strength;
         MaxHealth = characterData.MaxHealth;
         // always start full life
         Health = characterData.MaxHealth;
@@ -187,18 +201,58 @@ public class CharacterManager : MonoBehaviour
         }
     }
 
+    public List<DamageLine> ComputeDamage(int strPercentage, int iterations)
+    {
+        List<DamageLine> damages = new List<DamageLine>();
+        for(int i = 0; i < iterations; i++)
+        {
+            List<string> additionalEffects = new List<string>();
+            int damageDone = (Strength * strPercentage) / 100;            
 
+            bool IsCritical = Random.Range(1, 101) < CritChance;
+            if(IsCritical)
+            {
+                damageDone *= 2;
+            }
 
-    public void TakeDamage(int damage)
+            // check bleed chance
+            if(items.Any(i => i.Name == "Dagger"))
+            {
+                int chancesToBleed = items.First(i => i.Name == "Dagger").Quantity*5;
+                if(Random.Range(1, 101) < chancesToBleed)
+                {
+                    additionalEffects.Add("Bleed");
+                }
+            }
+
+           damages.Add(new DamageLine{Damage = damageDone, IsCritical = IsCritical, AdditionalEffects = additionalEffects});
+        }
+
+        return damages;
+    }
+
+    public void TakeDamage(DamageLine damage)
     {
         previousHealth = Health;
-        Health -= damage;
+        Health -= damage.Damage;
         if (Health < 0)
         {
             Health = 0;
         }
         // Show a text effect that disappears after a few seconds
-        ShowTextEffect("-" + damage, Color.red);
+        if(damage.IsCritical)
+        {
+            ShowTextEffect("-" + damage.Damage + " !", Color.yellow);
+        }
+        else
+        {
+            ShowTextEffect("-" + damage.Damage, Color.red);
+        }
+
+        foreach(string effect in damage.AdditionalEffects)
+        {
+            ShowTextEffect(effect, Color.blue);
+        }
 
         // Update the Slider value and color
         if (healthSlider != null)

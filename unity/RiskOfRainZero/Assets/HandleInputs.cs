@@ -13,6 +13,7 @@ public class HandleInputs : MonoBehaviour
     public MessagePanelManager messagePanelManager;
     Characters charcterSelected;
     private Coroutine hidePanelCoroutine;
+    private bool CanStartFoeTurn = false;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +36,12 @@ public class HandleInputs : MonoBehaviour
                     StopCoroutine(hidePanelCoroutine);
                 }
             }
+        }
+
+        if(messagePanelManager.CanDisplay == false && CanStartFoeTurn)
+        {
+            gameManager.EnemyTurn();
+            CanStartFoeTurn = false;
         }
     }
 
@@ -82,15 +89,17 @@ public class HandleInputs : MonoBehaviour
         {
             case 1:
                 Debug.Log("SHOOT");
-                gameManager.inflictDamage(true, "Lemurian", 10);
+                gameManager.inflictDamage(true, "Lemurian", 100, 1);
                 messagePanelManager.SetMessage("Commando fire a shot at Lemurian, it deals " + 10 + " damage !");
                 messagePanelManager.DisplayMessage();
+                CanStartFoeTurn = true;
                 break;
             case 2:
                 Debug.Log("BANG");
-                gameManager.inflictDamage(true, "Lemurian", 50);
+                gameManager.inflictDamage(true, "Lemurian", 500, 1);
                 messagePanelManager.SetMessage("BANG !, it deals " + 50 + " damage !");
                 messagePanelManager.DisplayMessage();
+                CanStartFoeTurn = true;
                 break;
             case 3:
                 Debug.Log("Commando Attack 3");

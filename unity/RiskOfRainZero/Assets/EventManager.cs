@@ -83,18 +83,21 @@ public class EventManager : MonoBehaviour
             enemyData.ImgName = "lemurian";
             enemyData.MaxHealth = 80;
             enemyData.Name = "Lemurian";
+            enemyData.Strength = 10;
         }
         else if (dice < 80)
         {
             enemyData.ImgName = "millenialTurtle";
             enemyData.MaxHealth = 130;
             enemyData.Name = "Millenial Turtle";
+            enemyData.Strength = 7;
         }
         else
         {
             enemyData.ImgName = "wisp";
             enemyData.MaxHealth = 50;
             enemyData.Name = "Flame wisp";
+            enemyData.Strength = 20;
         }
 
         return enemyData;

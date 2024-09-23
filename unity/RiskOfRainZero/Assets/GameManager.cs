@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 public class GameManager : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -37,7 +38,9 @@ public class GameManager : MonoBehaviour
                 {
                     ImgName = "NoIMG",
                     MaxHealth = 142,
-                    Name = "Commando"
+                    Name = "Commando",
+                    Strength = 10,
+                    CritChance = 10
                 });
                 break;
             case Characters.MICHEL:
@@ -93,17 +96,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void inflictDamage(bool isHero, string enemyName, int damage)
+    public void inflictDamage(bool isHero, string enemyName, int strPercentage, int iterations)
     {
         if (isHero)
         {
+            // get damages done from hero 
+            List<DamageLine> damages = Hero.GetComponent<CharacterManager>().ComputeDamage(strPercentage, iterations);
             CharacterManager characterManager = Enemy.GetComponent<CharacterManager>();
-            characterManager.TakeDamage(damage);
+
+            foreach (DamageLine damage in damages)
+            {
+                characterManager.TakeDamage(damage);
+            }
         }
         else
-        {
+        {            
+            DamageLine dmg = Enemy.GetComponent<CharacterManager>().ComputeDamage(100, 1).First();
             CharacterManager characterManager = Hero.GetComponent<CharacterManager>();
-            characterManager.TakeDamage(damage);
+            characterManager.TakeDamage(dmg);
+            
+            messagePanelManager.SetMessage("Foe is attacking, it deals " + dmg.Damage + " damage !");
+            messagePanelManager.DisplayMessage();
+
         }
     }
 
@@ -150,7 +164,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void EnemyTurn()
+    {
 
+        // roll damage 
+        inflictDamage(false, "Commando", 100, 1);
+    }
     public void LoadNextEvent()
     {
         // if(chestleft > 0)
