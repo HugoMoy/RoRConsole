@@ -30,7 +30,10 @@ public class HandleInputs : MonoBehaviour
             if (messagePanelManager != null)
             {
                 messagePanelManager.HideMessage();
-                StopCoroutine(hidePanelCoroutine);
+                if(hidePanelCoroutine != null)
+                {
+                    StopCoroutine(hidePanelCoroutine);
+                }
             }
         }
     }
@@ -78,13 +81,16 @@ public class HandleInputs : MonoBehaviour
         switch(attackNumber)
         {
             case 1:
-                Debug.Log("Commando Attack 1");
+                Debug.Log("SHOOT");
                 gameManager.inflictDamage(true, "Lemurian", 10);
                 messagePanelManager.SetMessage("Commando fire a shot at Lemurian, it deals " + 10 + " damage !");
                 messagePanelManager.DisplayMessage();
                 break;
             case 2:
-                Debug.Log("Commando Attack 2");
+                Debug.Log("BANG");
+                gameManager.inflictDamage(true, "Lemurian", 50);
+                messagePanelManager.SetMessage("BANG !, it deals " + 50 + " damage !");
+                messagePanelManager.DisplayMessage();
                 break;
             case 3:
                 Debug.Log("Commando Attack 3");

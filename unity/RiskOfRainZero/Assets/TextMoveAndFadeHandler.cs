@@ -37,7 +37,7 @@ public class TextMoveAndFadeHandler : MonoBehaviour
             Destroy(gameObject);
         }
 
-        Debug.Log("TimeBeforeFading: " + TimeBeforeFading);
-        Debug.Log("TimeBeforeDestroy: " + TimeBeforeDestroy);
+        // Debug.Log("TimeBeforeFading: " + TimeBeforeFading);
+        // Debug.Log("TimeBeforeDestroy: " + TimeBeforeDestroy);
     }
 }

@@ -140,6 +140,9 @@ public class GameManager : MonoBehaviour
             messagePanelManager.SetMessage("Enemy is dead");
             messagePanelManager.DisplayMessage();
 
+            // give a random loot
+            Hero.GetComponent<CharacterManager>().AddItem(new Item(){Name="Dagger", ImgName="dagger", Quantity=1});
+
             currentXP+=30;
             UpdateXpSlider();
 

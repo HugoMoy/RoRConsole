@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class CharacterData
 {
@@ -10,11 +11,18 @@ public class CharacterData
     public string Name;
 }
 
+public class Item
+{
+    public string Name;
+    public string ImgName;
+    public int Quantity;
+}
+
 public class CharacterManager : MonoBehaviour
 {
     public Image CharacterImage;
-
     public Text TextEffectTemplate;
+    public GameObject ItemTemplate;
     // public string CharacterName;
     public int Health;
     public int MaxHealth;
@@ -23,11 +31,11 @@ public class CharacterManager : MonoBehaviour
     private float lerpSpeed = 5f;
     private int previousHealth;
 
+    private List<Item> items = new List<Item>();
+
     // Start is called before the first frame update
     void Start()
-    {
-
-        
+    {        
         if (healthSlider != null)
         {
 
@@ -73,6 +81,62 @@ public class CharacterManager : MonoBehaviour
             // Update the color of the Fill area based on the health value
             UpdateHealthSlider();
         } 
+    }
+
+    public void AddItem(Item item)
+    {
+        if(items.Any(i => i.Name == item.Name))
+        {
+            items.First(i => i.Name == item.Name).Quantity += item.Quantity;
+            // Update quantity in UI
+            Transform itemHolder = this.transform.Find("Canvas/ItemHolder");
+            if(itemHolder != null)
+            {
+                Transform itemTemplate = itemHolder.Find(item.Name);
+                if(itemTemplate != null)
+                {
+                    itemTemplate.GetComponentInChildren<Text>().text = items.First(i => i.Name == item.Name).Quantity.ToString();                    
+                }
+                else
+                {
+                    Debug.LogError("ItemTemplate" + item.Name + " not found in children.");
+                }
+            }
+            else
+            {
+                Debug.LogError("ItemHolder not found in children.");
+            }
+        }
+        else
+        {
+            items.Add(item);
+            // add itemTemplate in UI
+            Transform itemHolder = this.transform.Find("Canvas/ItemHolder");
+            if(itemHolder != null)
+            {
+
+                GameObject itemInstance = Instantiate(ItemTemplate.gameObject, itemHolder.transform);
+                itemInstance.SetActive(false);
+
+                Image imageComponent = itemInstance.GetComponentInChildren<Image>();
+                Sprite sprite = Resources.Load<Sprite>("images/" + item.ImgName);
+                if(sprite == null)
+                {
+                    Debug.LogError("Sprite not found in Resources folder: " + item.ImgName);
+                    return;
+                }
+
+                itemInstance.GetComponentInChildren<Image>().sprite = sprite;
+                itemInstance.name = item.Name;
+                itemInstance.GetComponentInChildren<Text>().text = item.Quantity.ToString();
+                itemInstance.SetActive(true);
+
+            }
+            else
+            {
+                Debug.LogError("ItemHolder not found in children.");
+            }
+        }        
     }
 
     public void LoadCharacterData(CharacterData characterData)
