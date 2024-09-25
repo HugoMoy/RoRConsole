@@ -32,7 +32,9 @@ public class CharacterManager : MonoBehaviour
     public Text TextEffectTemplate;
     public GameObject ItemTemplate;
     // public string CharacterName;
-
+    public string EquipmentName;
+    public int EquipmentCooldown;
+    public int EquipmentCurrentCooldown;
     // Stats 
     public int Health;
     public int MaxHealth;
@@ -49,6 +51,7 @@ public class CharacterManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {        
+
         if (healthSlider != null)
         {
 
@@ -231,6 +234,31 @@ public class CharacterManager : MonoBehaviour
         return damages;
     }
 
+    public void UseEquipment()
+    {
+        if(EquipmentCurrentCooldown == 0)
+        {
+            Debug.Log("Using equipment - Pineapple");
+            
+            int previousHealth = Health;
+            int HpAfterHeal = Health + 40;
+            if(HpAfterHeal > MaxHealth)
+            {
+                Health = MaxHealth;
+            }
+            else
+            {
+                Health = HpAfterHeal;
+            }
+            Debug.Log("You healed " + (Health - previousHealth) + " HP");
+            EquipmentCurrentCooldown = EquipmentCooldown;
+        }
+        else
+        {
+            Debug.Log("Equipment is on cooldown");
+        }
+    }
+
     public void TakeDamage(DamageLine damage)
     {
         previousHealth = Health;
@@ -262,7 +290,7 @@ public class CharacterManager : MonoBehaviour
     }
 
     public void ShowTextEffect(string text, Color color)
-    {        
+    {    
         Canvas canvas = this.GetComponentInChildren<Canvas>();
         GameObject textEffectInstance = Instantiate(TextEffectTemplate.gameObject, canvas.transform);
         textEffectInstance.SetActive(false);
@@ -299,5 +327,13 @@ public class CharacterManager : MonoBehaviour
         }
 
         textEffectInstance.SetActive(true);
+    }
+
+    public void EndOfTurn()
+    {
+        if(EquipmentCurrentCooldown > 0)
+        {
+            EquipmentCurrentCooldown--;
+        }
     }
 }

@@ -15,6 +15,9 @@ public class HandleInputs : MonoBehaviour
     private Coroutine hidePanelCoroutine;
     private bool CanStartFoeTurn = false;
 
+    public Canvas FightCanvas;
+    public Canvas MenuCanvas;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,6 +27,18 @@ public class HandleInputs : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // check for mouse right click
+        if (Input.GetMouseButtonDown(1))
+        {
+            if(FightCanvas.gameObject.activeSelf)
+            {
+                // Hide AttackPanel
+                FightCanvas.gameObject.SetActive(false);
+                // Show MenuPanel
+                MenuCanvas.gameObject.SetActive(true);
+            }            
+        }
+        
         // Check for mouse click
         if (messagePanelManager.CanDisplay && Input.GetMouseButtonDown(0))
         {
@@ -45,6 +60,7 @@ public class HandleInputs : MonoBehaviour
         }
     }
 
+    // attack canvas
     public void AttackClicked(int attackNumber)
     {
         Debug.Log("Attack button clicked");
@@ -70,6 +86,30 @@ public class HandleInputs : MonoBehaviour
         hidePanelCoroutine = StartCoroutine(HidePanelAfterDelay(2f));
     }
 
+    // menu canvas
+    public void MenuActions()
+    {
+        // Hide MenuPanel
+        MenuCanvas.gameObject.SetActive(false);
+        // Show AttackPanel if it's a fight
+        FightCanvas.gameObject.SetActive(true);
+        // Show actionPanel if it's another event (TODO)
+    }
+
+    public void MenuUsable()
+    {
+        gameManager.UseEquipment();
+    }
+
+    public void MenuFlee()
+    {
+        gameManager.Flee();
+    }
+
+    public void MenuWait()
+    {
+        gameManager.Wait();
+    }
     private IEnumerator HidePanelAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);

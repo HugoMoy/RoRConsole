@@ -202,4 +202,24 @@ public class GameManager : MonoBehaviour
         //     }
         // }
     }
+
+    public void UseEquipment()
+    {
+
+        messagePanelManager.SetMessage("You use your equipment !");
+        messagePanelManager.DisplayMessage();
+        Hero.GetComponent<CharacterManager>().UseEquipment();
+    }
+
+    public void Flee()
+    {
+        messagePanelManager.SetMessage("You flee the battle !");
+        messagePanelManager.DisplayMessage();
+        //eventManager.LoadNextEvent();
+    }
+
+    public void Wait()
+    {
+
+    }
 }
