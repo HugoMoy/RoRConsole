@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Linq;
 public class GameManager : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class GameManager : MonoBehaviour
     public Button attackButton2;
     public Button attackButton3;
     public Button attackButton4;
+    public GameObject GameOverCanvas;
     public GameObject Hero;
     public GameObject Enemy;
     public MessagePanelManager messagePanelManager;
@@ -82,6 +84,10 @@ public class GameManager : MonoBehaviour
             // check transition 
             if(startFight)
             {
+                // Wait 2 seconds before starting the fight
+                // StartCoroutine(eventManager.Wait(2));
+            
+
                 CharacterData enemyData = eventManager.GetRandomEnemy();
                 // load new enemy
                 Enemy.GetComponent<CharacterManager>().LoadCharacterData(enemyData);
@@ -96,18 +102,51 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void inflictDamage(bool isHero, string enemyName, int strPercentage, int iterations)
+    public void ennemyArrival()
+    {
+
+        // wait 1 seconds
+
+        // Load new enemy
+        CharacterData enemyData = eventManager.GetRandomEnemy();
+        Enemy.GetComponent<CharacterManager>().LoadCharacterData(enemyData); 
+
+        // Display message saying a new foe arrived
+        messagePanelManager.SetMessage("An angry " + enemyData.Name + " appeared!");
+        messagePanelManager.DisplayMessage();       
+
+        // Make enemy picture appear on the right and come to the right side
+        // Enemy.GetComponent<CharacterManager>().HideCharacterHealthBar();      
+        // Enemy.GetComponent<CharacterManager>().ShowCharacterArriveFromLeft();  
+        // Enemy.GetComponent<CharacterManager>().ShowCharacterHealthBar(); 
+    }
+
+    public void inflictDamage(bool isHero, string attackText, int strPercentage, int iterations)
     {
         if (isHero)
         {
+            string damageText = "";
             // get damages done from hero 
             List<DamageLine> damages = Hero.GetComponent<CharacterManager>().ComputeDamage(strPercentage, iterations);
             CharacterManager characterManager = Enemy.GetComponent<CharacterManager>();
-
+            
+            damageText += "(";
+            int iter = 0;
             foreach (DamageLine damage in damages)
             {
+                if(iter > 0  && iter < damages.Count)
+                {
+                    damageText += "+ ";
+                }
+
                 characterManager.TakeDamage(damage);
+                damageText += damage.Damage + " ";
+                iter++;
             }
+            damageText += ")";
+
+            messagePanelManager.SetMessage(attackText + " " + damageText + " damages !");
+            messagePanelManager.DisplayMessage();
         }
         else
         {            
@@ -146,6 +185,7 @@ public class GameManager : MonoBehaviour
         if(Hero.GetComponent<CharacterManager>().Health <= 0)
         {
             Debug.Log("Hero is dead");
+            GameOverCanvas.SetActive(true);
         }
         else if(Enemy.GetComponent<CharacterManager>().Health <= 0)
         {
@@ -221,5 +261,10 @@ public class GameManager : MonoBehaviour
     public void Wait()
     {
 
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

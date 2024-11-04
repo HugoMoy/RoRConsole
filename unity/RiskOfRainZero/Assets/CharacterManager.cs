@@ -13,10 +13,17 @@ public class CharacterData
     public int CritChance;
 }
 
-public struct DamageLine{
+public struct DamageLine
+{
     public int Damage;
     public bool IsCritical;
     public List<string> AdditionalEffects;
+}
+
+public struct TextEffect
+{
+    public string Text;
+    public Color Color;
 }
 
 public class Item
@@ -47,6 +54,9 @@ public class CharacterManager : MonoBehaviour
     private int previousHealth;
 
     private List<Item> items = new List<Item>();
+
+    private List<TextEffect> textEffectsFifo = new List<TextEffect>();
+    public bool coroutineInProgress = false;
 
     // Start is called before the first frame update
     void Start()
@@ -97,6 +107,24 @@ public class CharacterManager : MonoBehaviour
             // Update the color of the Fill area based on the health value
             UpdateHealthSlider();
         } 
+
+        if(textEffectsFifo.Count > 0 && coroutineInProgress == false)
+        {
+            coroutineInProgress = true;
+            StartCoroutine(ExecuteFifo());
+        }     
+    }
+
+    public IEnumerator ExecuteFifo()
+    {
+        if(textEffectsFifo.Count > 0)
+        {
+            TextEffect textEffect = textEffectsFifo[0];
+            ShowTextEffect(textEffect.Text, textEffect.Color);
+            textEffectsFifo.RemoveAt(0);
+            yield return new WaitForSeconds(0.25F);
+        }
+        coroutineInProgress = false;
     }
 
     public void AddItem(Item item)
@@ -131,8 +159,9 @@ public class CharacterManager : MonoBehaviour
             if(itemHolder != null)
             {
 
-                GameObject itemInstance = Instantiate(ItemTemplate.gameObject, itemHolder.transform);
+                GameObject itemInstance = Instantiate(ItemTemplate.gameObject, Vector2.zero, Quaternion.identity, itemHolder);
                 itemInstance.SetActive(false);
+                itemInstance.transform.position = itemHolder.position;
 
                 Image imageComponent = itemInstance.GetComponentInChildren<Image>();
                 Sprite sprite = Resources.Load<Sprite>("images/" + item.ImgName);
@@ -270,16 +299,16 @@ public class CharacterManager : MonoBehaviour
         // Show a text effect that disappears after a few seconds
         if(damage.IsCritical)
         {
-            ShowTextEffect("-" + damage.Damage + " !", Color.yellow);
+            textEffectsFifo.Add(new TextEffect{Text = "-" + damage.Damage + " !", Color = Color.yellow});
         }
         else
         {
-            ShowTextEffect("-" + damage.Damage, Color.red);
+            textEffectsFifo.Add(new TextEffect{Text = "-" + damage.Damage, Color = Color.red});
         }
 
         foreach(string effect in damage.AdditionalEffects)
-        {
-            ShowTextEffect(effect, Color.blue);
+        {            
+            textEffectsFifo.Add(new TextEffect{Text = effect, Color = Color.blue});
         }
 
         // Update the Slider value and color
@@ -328,6 +357,8 @@ public class CharacterManager : MonoBehaviour
 
         textEffectInstance.SetActive(true);
     }
+
+
 
     public void EndOfTurn()
     {

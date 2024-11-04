@@ -129,23 +129,28 @@ public class HandleInputs : MonoBehaviour
         {
             case 1:
                 Debug.Log("SHOOT");
-                gameManager.inflictDamage(true, "Lemurian", 100, 1);
-                messagePanelManager.SetMessage("Commando fire a shot at Lemurian, it deals " + 10 + " damage !");
+                gameManager.inflictDamage(true, "Shoot", 200, 1);
+                // messagePanelManager.SetMessage("Commando fire a shot at Lemurian, it deals " + 10 + " damage !");
                 messagePanelManager.DisplayMessage();
                 CanStartFoeTurn = true;
                 break;
             case 2:
                 Debug.Log("BANG");
-                gameManager.inflictDamage(true, "Lemurian", 500, 1);
-                messagePanelManager.SetMessage("BANG !, it deals " + 50 + " damage !");
+                gameManager.inflictDamage(true, "Bang", 500, 1);
+                // messagePanelManager.SetMessage("BANG !, it deals " + 50 + " damage !");
                 messagePanelManager.DisplayMessage();
                 CanStartFoeTurn = true;
                 break;
             case 3:
-                Debug.Log("Commando Attack 3");
+                Debug.Log("ROLL");
+               
                 break;
             case 4:
-                Debug.Log("Commando Attack 3");
+                Debug.Log("BARILLET");
+                gameManager.inflictDamage(true, "Empty the barel", 100, 6);
+                // messagePanelManager.SetMessage("BANG !, it deals " + 50 + " damage !");
+                messagePanelManager.DisplayMessage();
+                CanStartFoeTurn = true;
                 break;
             default:
                 Debug.Log("Invalid attack number");
@@ -189,6 +194,16 @@ public class HandleInputs : MonoBehaviour
                 Debug.Log("Invalid attack number");
                 break;
         }
+    }
+
+    public void RestartButton()
+    {
+        gameManager.Restart();
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
     }
 
     
