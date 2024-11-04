@@ -36,12 +36,15 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\EventManager.cs" />
-     <Compile Include="Assets\HandleInputs.cs" />
-     <Compile Include="Assets\MessagePanelManager.cs" />
-     <Compile Include="Assets\CharacterManager.cs" />
-     <Compile Include="Assets\GameManager.cs" />
-     <Compile Include="Assets\TextMoveAndFadeHandler.cs" />
+     <Compile Include="Assets\Source\EventManager.cs" />
+     <Compile Include="Assets\Source\HandleInputs.cs" />
+     <Compile Include="Assets\Source\MessagePanelManager.cs" />
+     <Compile Include="Assets\Source\CharacterManager.cs" />
+     <Compile Include="Assets\Source\GameManager.cs" />
+     <Compile Include="Assets\Source\TextMoveAndFadeHandler.cs" />
+     <Compile Include="Assets\Source\Enums\GameEventType.cs" />
+     <Compile Include="Assets\Source\POCOs\CharacterData.cs" />
+     <Compile Include="Assets\Source\POCOs\Item.cs" />
     <Reference Include="UnityEngine">
         <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.7f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
